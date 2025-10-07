@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CGPA to Package Slot Machine</title>
+  <style>
+    /* Reset and layout */
+    body {
+      background: #f3f3f3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      position: relative;
+    }
+
+    /* Menu link (source) */
+    .menu-icon {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #333;
+      background: #f1f1f1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 101;
+    }
+    /* Hide the original span dots */
+    .menu-icon span {
+      display: none;
+    }
+
+    /* Description overlay */
+    .description-overlay {
+      position: fixed;
+      top: 60px;
+      left: 20px;
+      max-width: 360px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      font-size: 0.9rem;
+      color: #333;
+      display: none;
+      z-index: 100;
+      line-height: 1.4;
+    }
+    .description-overlay.show {
+      display: block;
+    }
+    .description-overlay h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+    .description-overlay a {
+      color: #0077cc;
+      text-decoration: underline;
+    }
+
+    /* Slot machine container */
+    .machine {
+      position: relative;
+      width: 360px;
+      height: 520px;
+      background: linear-gradient(180deg, #a90000 0%, #7f0000 100%);
+      border-radius: 20px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+      padding: 25px 20px;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* Title above machine */
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .instruction {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    /* CGPA input styled like a coin slot */
+    input[type=number] {
+      appearance: none;
+      background: #eee;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 85%;
+      margin: 0 auto;
+      display: block;
+      font-size: 1rem;
+      color: #333;
+    }
+    input[type=number]:focus {
+      outline: none;
+      border-color: #a90000;
+    }
+
+    /* Slot display area */
+    .slot-display {
+      margin: 40px auto 20px;
+      background: #ffffff;
+      color: #222;
+      border-radius: 12px;
+      height: 90px;
+      width: 85%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      letter-spacing: 6px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    /* Lever assembly */
+    .lever {
+      position: absolute;
+      right: -90px;
+      top: 120px;
+      width: 90px;
+      height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .lever-bar {
+      width: 24px;
+      flex-grow: 1;
+      background: #444;
+      border-radius: 12px;
+    }
+    .lever-ball {
+      width: 58px;
+      height: 58px;
+      background: radial-gradient(circle, #d9a066 0%, #b58041 100%);
+      border-radius: 50%;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #222;
+      font-weight: 700;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.1s ease;
+    }
+    .lever-ball:active {
+      transform: translateY(5px);
+    }
+
+    /* Like message below machine */
+    .like-message {
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: #333;
+      text-align: center;
+      max-width: 360px;
+    }
+
+    /* Credits sign board */
+    .credit {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 1rem;
+      color: #000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu link -->
+  <div class="menu-icon" id="menuIcon">source</div>
+
+  <!-- Description overlay -->
+  <div class="description-overlay" id="descriptionOverlay">
+    <p><a href="https://colab.research.google.com/drive/1tDb-85FEAppqHHMzLQrWpXHAesnhKxEl?usp=sharing" target="_blank">Link to Colab Notebook</a></p>
+    <h3>About this project</h3>
+    <p>
+      This interactive demo uses <strong>simple linear regression</strong>, a basic machine learning technique, to predict a student's expected salary based on their CGPA. By analyzing real placement data, the model finds a straight‑line relationship between CGPA and package. When you enter your CGPA and pull the lever, the trained model estimates your package in LPA. Data Science is all about extracting patterns from data to make informed predictions—this project showcases how even a simple model can turn numbers into insights!
+    </p>
+  </div>
+
+  <!-- Slot machine -->
+  <div class="machine">
+    <div class="title">CGPA to PACKAGE</div>
+    <div class="instruction">Insert your CGPA (0 – 10)</div>
+    <input type="number" id="cgpaInput" step="0.01" min="0" max="10" placeholder="e.g., 7.5">
+    <div class="slot-display" id="slotDisplay">---</div>
+    <!-- Lever assembly -->
+    <div class="lever">
+      <div class="lever-ball" id="leverBall">Pull</div>
+      <div class="lever-bar"></div>
+    </div>
+    <div class="footer">Expected salary displayed in LPA</div>
+  </div>
+
+  <!-- Like message under machine -->
+  <div class="like-message">
+    If you love this project then like the LinkedIn post where you were directed from
+  </div>
+
+  <!-- Credits sign -->
+  <div class="credit">Made by Wajid Iqbal</div>
+
+  <script>
+    // Coefficients from trained linear regression model
+    const slope = 0.5695912947937534;
+    const intercept = -0.9856779462557332;
+
+    const leverBall = document.getElementById('leverBall');
+    const slotDisplay = document.getElementById('slotDisplay');
+    const cgpaInput = document.getElementById('cgpaInput');
+    const menuIcon = document.getElementById('menuIcon');
+    const descriptionOverlay = document.getElementById('descriptionOverlay');
+
+    /**
+     * Animate the slot display with random numbers and then show predicted salary.
+     */
+    function spinAndPredict() {
+      const cgpa = parseFloat(cgpaInput.value);
+      // Validate input
+      if (isNaN(cgpa) || cgpa < 0 || cgpa > 10) {
+        slotDisplay.textContent = 'Err';
+        return;
+      }
+
+      // Compute predicted salary using linear regression coefficients
+      let predicted = slope * cgpa + intercept;
+      // Floor predicted salary to zero if negative
+      if (predicted < 0) predicted = 0;
+      // Format with 2 decimal places
+      predicted = predicted.toFixed(2);
+
+      let spins = 25; // number of spins before settling
+      const spinInterval = 80; // ms between updates
+      const timer = setInterval(() => {
+        // Display random floating number to simulate spin
+        slotDisplay.textContent = (Math.random() * 10).toFixed(2);
+        spins--;
+        if (spins <= 0) {
+          clearInterval(timer);
+          slotDisplay.textContent = predicted + ' LPA';
+        }
+      }, spinInterval);
+    }
+
+    // Attach event listener to lever ball
+    leverBall.addEventListener('click', spinAndPredict);
+
+    // Toggle description overlay
+    menuIcon.addEventListener('click', function() {
+      descriptionOverlay.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>
